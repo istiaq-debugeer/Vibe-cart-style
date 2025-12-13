@@ -1,14 +1,18 @@
+import "../styles/globals.css";
 import type { ReactNode } from "react";
-import { Provider } from "react-redux";
-import { store } from "@/lib/store";
+
+import ReduxProvider from "./ReduxProvider";
+import { Toaster } from "@/components/ui/toaster";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <Provider store={store}>
+        <ReduxProvider>
           {children}
-        </Provider>
+          <Toaster /> 
+        </ReduxProvider>
+        
       </body>
     </html>
   );

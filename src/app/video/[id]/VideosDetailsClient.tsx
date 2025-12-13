@@ -1,31 +1,62 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAppDispatch, useAppSelector } from "@/hooks/use-redux";
-import { fetchVideoById } from "@/lib/videoSlice";
+import { useGetVideoByIdQuery } from "@/lib/videoApi";
 
-import { ArrowLeft, Heart, MessageCircle, Star, ShoppingCart, Play } from "lucide-react";
+import {
+  ArrowLeft,
+  Heart,
+  MessageCircle,
+  Star,
+  ShoppingCart,
+  Play,
+} from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 export default function VideoDetailsClient({ id }: { id: string }) {
   const router = useRouter();
-  const dispatch = useAppDispatch();
 
-  const { current: video, loading, error } = useAppSelector((state) => state.video);
+  // RTK Query replaces fetchVideoById
+  const { data: video, isLoading, error } = useGetVideoByIdQuery(id);
 
   const [isLiked, setIsLiked] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  useEffect(() => {
-    dispatch(fetchVideoById(id));
-  }, [id, dispatch]);
-
-  if (loading) return <div className="p-4 text-center">Loading video...</div>;
-  if (error) return <div className="p-4 text-red-500 text-center">{error}</div>;
+  if (isLoading) return <div className="p-4 text-center">Loading video...</div>;
+  if (error) return <div className="p-4 text-center text-red-500">Error loading video</div>;
   if (!video) return <div className="p-4 text-center">No video found.</div>;
+
+  // Similar videos (static for now)
+  const similarVideos = [
+    {
+      id: "4",
+      title: "Elegant Evening Wear",
+      thumbnail: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=200&h=150&fit=crop",
+      seller: "Emma Styles",
+    },
+    {
+      id: "5",
+      title: "Boho Chic Vibes",
+      thumbnail: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=200&h=150&fit=crop",
+      seller: "Maya Boutique",
+    },
+    {
+      id: "6",
+      title: "Trendy Streetwear",
+      thumbnail: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=200&h=150&fit=crop",
+      seller: "Urban Vibes",
+    },
+    {
+      id: "7",
+      title: "Minimalist Chic",
+      thumbnail: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=200&h=150&fit=crop",
+      seller: "Clean Lines Co",
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50 flex justify-center">
@@ -64,6 +95,7 @@ export default function VideoDetailsClient({ id }: { id: string }) {
                 alt={video.title}
                 className="w-full h-96 object-cover"
               />
+
               <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                 <Button
                   onClick={() => setIsPlaying(true)}
@@ -80,7 +112,6 @@ export default function VideoDetailsClient({ id }: { id: string }) {
               controls
               autoPlay
               onPause={() => setIsPlaying(false)}
-              onPlay={() => setIsPlaying(true)}
             />
           )}
 
@@ -98,24 +129,22 @@ export default function VideoDetailsClient({ id }: { id: string }) {
           <div className="flex items-center space-x-3 mb-3">
             <img
               src={video.seller.avatar}
-              alt={video.seller.name}
-              className="w-10 h-10 rounded-full border-2 border-gray-300"
+              className="w-10 h-10 rounded-full border"
             />
 
             <div>
               <p className="font-semibold">{video.seller.name}</p>
-              <div className="flex items-center space-x-4 text-sm text-gray-500">
-                <span>{video.likes} likes</span>
-                <span>{video.comments} comments</span>
-              </div>
+              <p className="text-sm text-gray-500">
+                {video.likes} likes • {video.comments} comments
+              </p>
             </div>
           </div>
 
           <p className="text-gray-600 mb-3">{video.description}</p>
 
           <div className="flex flex-wrap gap-2 mb-4">
-            {video.hashtags?.map((tag, idx) => (
-              <span key={idx} className="text-black text-sm font-medium">
+            {video.hashtags?.map((tag, index) => (
+              <span key={index} className="text-black text-sm font-medium">
                 #{tag}
               </span>
             ))}
@@ -151,9 +180,7 @@ export default function VideoDetailsClient({ id }: { id: string }) {
                         <span className="text-xs text-gray-400 line-through">
                           ${product.originalPrice}
                         </span>
-                        <Badge className="bg-black text-white text-xs">
-                          {product.discount}
-                        </Badge>
+                        <Badge className="bg-black text-white text-xs">{product.discount}</Badge>
                       </div>
 
                       <div className="flex items-center space-x-1 mb-3">
@@ -161,12 +188,44 @@ export default function VideoDetailsClient({ id }: { id: string }) {
                         <span className="text-xs">{product.rating}</span>
                       </div>
 
-                      <Button className="w-full bg-black text-white h-7 text-xs flex items-center justify-center">
-                        <ShoppingCart className="h-3 w-3 mr-1" />
-                        Add to Cart
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button className="w-full bg-black text-white h-7 text-xs flex items-center justify-center">
+                          <ShoppingCart className="h-3 w-3 mr-1" />
+                          Add to Cart
+                        </Button>
+
+                        <Button
+                          variant="outline"
+                          className="w-full h-7 text-xs border-black"
+                        >
+                          Buy Now
+                        </Button>
+                      </div>
                     </div>
 
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Similar Videos */}
+        <div className="px-4 mb-8">
+          <h3 className="text-lg font-semibold mb-4">Similar from Other Sellers</h3>
+
+          <div className="grid grid-cols-2 gap-4">
+            {similarVideos.map((sv) => (
+              <Card
+                key={sv.id}
+                className="cursor-pointer hover:shadow-lg transition-shadow"
+                onClick={() => router.push(`/video/${sv.id}`)}
+              >
+                <CardContent className="p-0">
+                  <img src={sv.thumbnail} className="w-full h-32 object-cover rounded-t-lg" />
+                  <div className="p-3">
+                    <h4 className="font-medium text-sm">{sv.title}</h4>
+                    <p className="text-xs text-gray-500">{sv.seller}</p>
                   </div>
                 </CardContent>
               </Card>

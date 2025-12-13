@@ -53,19 +53,21 @@ const Cart = () => {
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const shipping = 5.99;
   const total = subtotal + shipping;
-
+  const router = useRouter();
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-md shadow-sm border-b border-border">
-        <div className="flex items-center justify-between px-4 py-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-xl font-semibold text-foreground">Shopping Cart</h1>
-          <div className="w-10" /> {/* Spacer for alignment */}
-        </div>
-      </header>
+      <div className="flex items-center justify-between px-4 py-4">
+        <Button variant="ghost" size="icon" onClick={() => router.back()}>
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+
+        <h1 className="text-xl font-semibold text-foreground">Shopping Cart</h1>
+
+        <div className="w-10" /> {/* Spacer */}
+      </div>
+    </header>
 
       <main className="max-w-md mx-auto pb-32">
         {cartItems.length === 0 ? (
