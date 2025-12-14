@@ -40,7 +40,6 @@ const products: Record<string, Product> = {
       "Imported",
     ],
   },
-
   "2": {
     id: "2",
     name: "Casual Denim Jacket",
@@ -78,10 +77,12 @@ const products: Record<string, Product> = {
 };
 
 export async function GET(
-  _: Request,
-  { params }: { params: { id: string } }
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> } // ✅ params is a Promise
 ) {
-  const product = products[params.id];
+  const { id } = await params; // ✅ MUST await
+
+  const product = products[id];
 
   if (!product) {
     return NextResponse.json(
