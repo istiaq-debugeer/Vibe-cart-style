@@ -1,4 +1,4 @@
-// src/app/product/[id]/page.tsx
+import { Suspense } from "react";
 import ProductDetailsClient from "./ProductDetailsClient";
 
 type Props = {
@@ -6,7 +6,11 @@ type Props = {
 };
 
 export default async function ProductDetailsPage({ params }: Props) {
-  const { id } = await params; 
+  const { id } = await params;
 
-  return <ProductDetailsClient id={id} />;
+  return (
+    <Suspense fallback={<div className="p-4">Loading product...</div>}>
+      <ProductDetailsClient id={id} />
+    </Suspense>
+  );
 }
