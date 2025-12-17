@@ -7,6 +7,7 @@ import { ArrowLeft, Heart, Star, ShoppingCart, Minus, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useGetProductByIdQuery } from "@/lib/productApi";
+import FacebookLivePlayer from "@/components/facebooklivevideo";
 
 export default function ProductDetailsClient({ id }: { id: string }) {
   const router = useRouter();
@@ -18,7 +19,8 @@ export default function ProductDetailsClient({ id }: { id: string }) {
   const [isLiked, setIsLiked] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<string>("");
-
+  const FACEBOOK_LIVE_URL =
+    "https://www.facebook.com/dailyshobji/videos/835290475972347/"
   // 🔹 Effect hook (ALWAYS called)
   useEffect(() => {
     if (product?.sizes?.length) {
@@ -68,6 +70,8 @@ export default function ProductDetailsClient({ id }: { id: string }) {
         />
 
         {/* INFO */}
+        {/* Facebook Live */}
+      <FacebookLivePlayer liveUrl={FACEBOOK_LIVE_URL} />
         <div className="bg-white px-4 py-4">
           <h1 className="text-xl font-bold">{product.name}</h1>
 
